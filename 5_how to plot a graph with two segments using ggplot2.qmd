@@ -1,0 +1,60 @@
+<div style="text-align: center; font-size: 35px; font-weight: bold;">
+  Plot with two segments using ggplot2
+</div>
+
+## Load libraries
+
+```{r}
+library(ggplot2)
+library(cowplot)
+```
+
+## Generate sample data
+
+```{r}
+df <- data.frame(
+  x = 1:20,
+  # y has two ranges of data, one with the mean of 10, the other one with the mean of 100
+  y = c(rnorm(10, mean = 10), rnorm(10, mean = 100))
+)
+```
+
+## Create two plots (i.e. p1 and p2)
+
+```{r}
+p1 <- ggplot(df[1:10, ], aes(x = x, y = y)) +
+  geom_point() +
+  geom_line() +
+  labs(x = "X-axis", y = "") +
+  theme_classic() +
+  theme(
+    plot.margin = margin(t = 0, l = 1, unit = "cm") # t: top; l: left  
+  ) +
+  scale_y_continuous(breaks = seq(7, 13, by = 1), limits = c(7, 13)) # tailered based on real data
+
+p2 <- ggplot(df[11:20, ], aes(x = x, y = y)) +
+  geom_point() +
+  geom_line() +
+  labs(title = "Plot with two segments", x = "", y = "") +
+  theme_classic() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 15, face = "bold"), # hjust = 0.5 means center   
+    plot.margin = margin(b = 0, l = 1, t = 0.5, unit = "cm"), # b: bottom; l: left; t: top
+    panel.border = element_blank(),
+    axis.text.x = element_blank(),
+    axis.line.x = element_blank(),
+    axis.ticks.x = element_blank()
+  ) +
+  scale_y_continuous(breaks = seq(98, 103, by = 2), limits = c(98, 103)) # tailered based on real data
+```
+
+## Use cowplot to merge the two plots of p1 and p2 vertically
+
+```{r}
+combined_plot <- plot_grid(p2, p1, ncol = 1, align = "v", rel_heights = c(1, 2), vjust = 0) # align = "v" means vertically; rel_heights: relative height; vjust: vertical alignment
+
+final_plot <- ggdraw(combined_plot) +
+  draw_label(expression(paste("E (cm", H[2], "O/mL)")), x = 0.05, y = 0.5, angle = 90, vjust = 0.5) # vjust = 0.5 means center
+
+final_plot
+```
